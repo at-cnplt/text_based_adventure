@@ -1,4 +1,3 @@
-
 import time
 import random
 
@@ -32,12 +31,85 @@ bandit = Enemy("bandit", -1, 30, 30)
 bandit_leader = Enemy("bandit leader", 2, 25, 50)
 
 dragon = Enemy("dragon", 3, 60, 50)
-locations = [["You enter a Cavern. It's damp and dark walls and floors look travelled.", "You find yourself in a dark room, next to a river that runs through cave.", "From the ceiling, you see a dark shadow emerge. A spider!", spider, 30, "You see a pool of water and a stone bridge.", "You see a tall figure aproaching. A Hobgoblin!", hobgoblin, "You see the sunlight in front. You move towards it. You emerge from the cave and to the path!"],
-             ["While traveling the woods, the jungle gets thicker and thicker.", "Suddenly, you get to a clearing among the trees.", "From the bushes a shadow quickly approaches towards you. A goblin!", goblin, 30, "You come across some ruins of an old castle. You head inside.",
-              "While inspecting the dilapidated castle you quickly realize a Bugbear made this place it's nest, it swipes at you with a flash!", bugbear, "You make your way out of the thick jungle and to the well traveled road..."],
+locations = [["You enter a Cavern. It's damp and dark walls and floors look travelled.", "You find yourself in a dark room, next to a river that runs through cave.", "From the ceiling, you see a dark shadow emerge. A spider!", spider, 30, "You see a pool of water and a stone bridge.", "You see a tall figure aproaching. A Hobgoblin!", hobgoblin, "You see the sunlight in front. You move towards it. You emerge from the cave and to the path!", "Cavern"],
+             ["While traveling the woods, the jungle gets thicker and thicker.", "Suddenly, you get to a clearing among the trees.", "From the bushes a shadow quickly jumps towards you. A goblin!", goblin, 30, "You come across some ruins of an old castle. You head inside.",
+              "While inspecting the dilapidated castle you quickly realize a Bugbear made this place it's nest, it swipes at you with a flash!", bugbear, "You make your way out of the thick jungle and to the well traveled road...", "Jungle"],
              ["You see a camp fire at the distance. You decide to slowly aproach.", "Next to the campfire you only see a tent and one man sitting, and a chest.", "'crack!' the man suddenly gets up as he hears you step on a branch. After seeing you, unsheaths his axe and runs toward you!",
-              bandit, 50, "Hearing the noise another man emergers from the tent, holding a greathammer!", "Man yells 'I will end you!!' as he starts to swing around his hammer.", bandit_leader, "You emerge victoriously from the bandit camp!"]
+              bandit, 50, "Hearing the noise another man emergers from the tent, holding a greathammer!", "Man yells 'I will end you!!' as he starts to swing around his hammer.", bandit_leader, "You emerge victoriously from the bandit camp!", "Camp"]
              ]
+
+
+def shop(player):
+    while True:
+        print(player.__str__())
+        print(
+            f"What would you like to buy?  Your money : {player.money}gps!   ('E' to exit)")
+        e = input(
+            "(+5)Greatsword(25gp)  -  Potion(10gp)  -  Scroll(15gp) :").lower()
+        if e == "greatsword" and player.money > 24:
+            player.att = 5
+            player.money -= 25
+            time.sleep(2)
+        elif e == "potion" and player.money > 9:
+            player.pot += 1
+            player.money -= 10
+            time.sleep(2)
+        elif e == "scroll" and player.money > 14:
+            player.skill += 1
+            player.money -= 15
+            time.sleep(2)
+        else:
+            break
+
+
+def shop2(player):
+    while True:
+        print(player.__str__())
+        print(
+            f"What would you like to buy?  Your money : {player.money}gps!   ('E' to exit)")
+        e = input("(+8)Avenger(30gp)  -  Potion(10gp)  -  Scroll(15gp) :").lower()
+        if e == "avenger" and player.money > 29:
+            player.att = 8
+            player.money -= 30
+            time.sleep(2)
+        elif e == "potion" and player.money > 9:
+            player.pot += 1
+            player.money -= 10
+            time.sleep(2)
+        elif e == "scroll" and player.money > 14:
+            player.skill += 1
+            player.money -= 15
+            time.sleep(2)
+        else:
+            break
+
+
+def tavern(player):
+    print("Would you like a room for the night? (heals 25 hp)")
+    time.sleep(2)
+    d = input("Room(15gp) - leave: ").lower()
+    if d == "room":
+        print("You decided to stay the night...")
+        time.sleep(2)
+        player.money -= 15
+        player.health += 20
+
+
+def village(player, shopf):
+    print("Welcome to the village....")
+    time.sleep(2)
+    while True:
+        print(player.__str__())
+        c = input("Tavern  -  Shop  -  Outside : ").lower()
+        time.sleep(2)
+        if c == "tavern":
+            tavern(player)
+
+        elif c == "shop":
+            shopf(player)
+
+        else:
+            break
 
 
 def attack(attr):
@@ -99,7 +171,7 @@ def combat(player, enemy):
             if player.skill <= 0:
                 print("You don't have a scroll!!")
             else:
-                y = attack(20)
+                y = attack(25)
                 print(f"Fireball!!! you've dealt {y} damage!\n")
                 player.skill -= 1
                 enemy.health -= y
@@ -148,78 +220,26 @@ def gameplay():
     time.sleep(2)
     print(player1.__str__())
     time.sleep(2)
+    z = input("left  or  right : ")
     a = random.sample(range(len(locations)), k=2)
     time.sleep(2)
     game(a[0], player1)
+    if player1.health <= 0:
+        exit()
     time.sleep(1)
     print("Welcome to the village...")
     time.sleep(1)
-    while True:
-        print(player1.__str__())
-        c = input("Tavern  -  Shop  -  Outside : ").lower()
-        if c == "tavern":
-            d = input("Room(15gp) - leave: ").lower()
-            if d == "room":
-                print("You decided to stay the night...")
-                time.sleep(2)
-                player1.money -= 15
-                player1.health += 20
-        elif c == "shop":
-            while True:
-                print(player1.__str__())
-                print(
-                    f"What would you like to buy?  Your money : {player1.money}gps!   ('E' to exit)")
-                e = input(
-                    "(+5)Greatsword(25gp)  -  Potion(10gp)  -  Scroll(15gp) :").lower()
-                if e == "greatsword" and player1.money > 24:
-                    player1.att = 5
-                    player1.money -= 25
-                elif e == "potion" and player1.money > 9:
-                    player1.pot += 1
-                    player1.money -= 10
-                elif e == "scroll" and player1.money > 14:
-                    player1.skill += 1
-                    player1.money -= 15
-                else:
-                    break
-        else:
-            break
+    village(player1, shop)
     time.sleep(2)
     print("On the road again...")
     time.sleep(2)
+    z = input("left  or  right : ")
+    time.sleep(1)
     game(a[1], player1)
+    if player1.health <= 0:
+        exit()
     time.sleep(2)
-    print("Welcome back to the village...")
-    while True:
-        print(player1.__str__())
-        c = input("Tavern  -  Shop  -  Outside : ").lower()
-        if c == "tavern":
-            d = input("Room(15gp) - leave: ").lower()
-            if d == "room":
-                print("You decided to stay the night...")
-                time.sleep(2)
-                player1.money -= 15
-                player1.health += 20
-        elif c == "shop":
-            while True:
-                print(player1.__str__())
-                print(
-                    f"What would you like to buy?  Your money : {player1.money}gps!")
-                e = input(
-                    "(+9)Avenger(30gp)  -  Potion(10gp)  -  Scroll(15gp) :").lower()
-                if e == "greatsword" and player1.money > 29:
-                    player1.att = 9
-                    player1.money -= 25
-                elif e == "potion" and player1.money > 9:
-                    player1.pot += 1
-                    player1.money -= 10
-                elif e == "scroll" and player1.money > 14:
-                    player1.skill += 1
-                    player1.money -= 15
-                else:
-                    break
-        else:
-            break
+    village(player1, shop2)
     time.sleep(3)
     print("\nYou warrior, are ready for the dragon...")
     combat(player1, dragon)
