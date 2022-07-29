@@ -227,8 +227,6 @@ def gameplay():
     if player1.health <= 0:
         exit()
     time.sleep(1)
-    print("Welcome to the village...")
-    time.sleep(1)
     village(player1, shop)
     time.sleep(2)
     print("On the road again...")
