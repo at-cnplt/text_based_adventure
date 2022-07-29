@@ -113,12 +113,11 @@ def village(player, shopf):
 
 
 def attack(attr):
-    dice = [x for x in range(1, 13)]
+    dice = list(range(1,12))
     d12 = random.choice(dice) + attr
     if d12 > 0:
         return d12
-    else:
-        return 0
+    return 0
 
 
 def combat(player, enemy):
