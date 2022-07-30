@@ -2,25 +2,24 @@ import time
 import random
 
 
-class Player():
-    def __init__(self, name, att, health, money, pot, skill):
+class Enemy():
+    def __init__(self, name=str, att=int, health=int, money=int):
         self.name = name
         self.att = att
         self.health = health
         self.money = money
+
+
+class Player(Enemy):
+    def __init__(self, name=str, att=int, health=int, money=int, pot=int, skill=int, max_health=int, level=int):
+        super().__init__(name, att, health, money)
         self.pot = pot
         self.skill = skill
+        self.max_health = max_health
+        self.level = level
 
     def __str__(self) -> str:
-        return f"{self.name} - HP:{self.health} - weapon damage:{self.att} \nGold : {self.money}gp - Potions : {self.pot} - Magic scrolls: {self.skill}"
-
-
-class Enemy():
-    def __init__(self, name, att, health, money):
-        self.name = name
-        self.att = att
-        self.health = health
-        self.money = money
+        return f"{self.name} - Lvl:{self.level} - HP:{self.health} - Weapon damage:{self.att} \nGold : {self.money}gp - Potions : {self.pot} - Magic scrolls: {self.skill}"
 
 
 goblin = Enemy("goblin", -2, 20, 10)
@@ -40,80 +39,90 @@ locations = [["You enter a Cavern. It's damp and dark walls and floors look trav
 
 
 def shop(player):
+    inventory = {"greatsword": 25, "avenger": 50,
+                 "potion": 15, "scroll": 20}
+    print("\nWelcome to the shop!")
+    time.sleep(1)
     while True:
-        print(player.__str__())
-        print(
-            f"What would you like to buy?  Your money : {player.money}gps!   ('E' to exit)")
-        e = input(
-            "(+5)Greatsword(25gp)  -  Potion(10gp)  -  Scroll(15gp) :").lower()
-        if e == "greatsword" and player.money > 24:
-            player.att = 5
-            player.money -= 25
-            time.sleep(2)
-        elif e == "potion" and player.money > 9:
-            player.pot += 1
-            player.money -= 10
-            time.sleep(2)
-        elif e == "scroll" and player.money > 14:
-            player.skill += 1
-            player.money -= 15
-            time.sleep(2)
-        else:
+        print(player)
+        time.sleep(2)
+        for i, j in inventory.items():
+            print(f"{i} ({j}gps)  -  ", end="")
+        a = input("\nChoose item(e for exit):").lower()
+        if a == "e":
             break
+        if a not in inventory.keys():
+            print("No such item!")
+            continue
+        price = inventory.get(a)
+        if price > player.money:
+            print("Not enough gold!")
+            time.sleep(1)
+            continue
+        else:
+            print(f"You have purchased {a}")
+            time.sleep(1)
+            if a == "greatsword":
+                player.money -= 25
+                player.att = 5
+            elif a == "avenger":
+                player.money -= 50
+                player.att = 8
+            elif a == "potion":
+                player.money -= 15
+                player.pot += 1
+            elif a == "scroll":
+                player.money -= 20
+                player.skill += 1
+            else:
+                print("\nWrong prompt!")
 
 
-def shop2(player):
-    while True:
-        print(player.__str__())
-        print(
-            f"What would you like to buy?  Your money : {player.money}gps!   ('E' to exit)")
-        e = input("(+8)Avenger(30gp)  -  Potion(10gp)  -  Scroll(15gp) :").lower()
-        if e == "avenger" and player.money > 29:
-            player.att = 8
-            player.money -= 30
-            time.sleep(2)
-        elif e == "potion" and player.money > 9:
-            player.pot += 1
-            player.money -= 10
-            time.sleep(2)
-        elif e == "scroll" and player.money > 14:
-            player.skill += 1
-            player.money -= 15
-            time.sleep(2)
-        else:
-            break
+def heal(player):
+    player.pot -= 1
+    player.health += 25
+    if player.health > player.max_health:
+        player.health = player.max_health
+
+
+
 
 
 def tavern(player):
     print("Would you like a room for the night? (heals 25 hp)")
-    time.sleep(2)
+    time.sleep(1)
     d = input("Room(15gp) - leave: ").lower()
     if d == "room":
         print("You decided to stay the night...")
         time.sleep(2)
         player.money -= 15
-        player.health += 20
+        heal(player)
+        player.pot += 1
 
 
 def village(player, shopf):
     print("Welcome to the village....")
     time.sleep(2)
     while True:
-        print(player.__str__())
+        print(player)
+        time.sleep(1)
         c = input("Tavern  -  Shop  -  Outside : ").lower()
-        time.sleep(2)
+        time.sleep(1)
         if c == "tavern":
             tavern(player)
 
         elif c == "shop":
             shopf(player)
 
-        else:
+        elif c == "outside":
             break
+
+        else:
+            print("\nWrong prompt!")
 
 
 def attack(attr):
-    dice = list(range(1,12))
+    dice = list(range(1, 13))
     d12 = random.choice(dice) + attr
     if d12 > 0:
         return d12
@@ -142,37 +151,22 @@ def combat(player, enemy):
             f"{player.name} HP:{player.health}        {enemy.name} HP : {enemy.health}\n")
         time.sleep(1)
         x = input(
-            f"Choose action \nATTACK(+{player.att}) - HEAL({player.pot}) - FIREBALL({player.skill}): ").lower()
+            f"Choose action \nATTACK - HEAL({player.pot}): ").lower()
         time.sleep(2)
         if x == "heal":
             if player.pot > 0:
                 print("Used healing potion!\n")
-                player.pot -= 1
-                player.health += 20
+                heal(player)
                 time.sleep(2)
             else:
                 print("No potion left!\n")
                 time.sleep(2)
         elif x == "attack":
-            y = attack(player.att)
-            print(f"You've dealt {y} damage!\n")
-            enemy.health -= y
-            time.sleep(2)
-            if enemy.health <= 0:
-                print("Enemy felled!\n")
-                time.sleep(1)
-                print(f"You gained {enemy.money} gold.\n")
-                time.sleep(1)
-                player.money += enemy.money
-                break
-
-        elif x == "fireball":
-            if player.skill <= 0:
-                print("You don't have a scroll!!")
-            else:
-                y = attack(25)
-                print(f"Fireball!!! you've dealt {y} damage!\n")
-                player.skill -= 1
+            a = input(
+                f"Weapon(+{player.att})  - Fireball(+25)({player.skill} left): ").lower()
+            if a == "weapon":
+                y = attack(player.att)
+                print(f"You've dealt {y} damage!\n")
                 enemy.health -= y
                 time.sleep(2)
                 if enemy.health <= 0:
@@ -182,6 +176,25 @@ def combat(player, enemy):
                     time.sleep(1)
                     player.money += enemy.money
                     break
+
+            elif a == "fireball":
+                if player.skill <= 0:
+                    print("You don't have a scroll!!")
+                else:
+                    y = attack(25)
+                    print(f"Fireball!!! you've dealt {y} damage!\n")
+                    player.skill -= 1
+                    enemy.health -= y
+                    time.sleep(2)
+                    if enemy.health <= 0:
+                        print("Enemy felled!\n")
+                        time.sleep(1)
+                        print(f"You gained {enemy.money} gold.\n")
+                        time.sleep(1)
+                        player.money += enemy.money
+                        break
+            else:
+                print("wrong prompt!")
 
         else:
             print("wrong prompt!")
@@ -199,7 +212,7 @@ def game(l, player):
     if player.health < 0:
         exit()
     time.sleep(3)
-    print(f"you found a chest and gained {loc[4]} gold!")
+    print(f"you found a chest and gained {loc[4]} gold!\n")
     time.sleep(3)
     print(loc[5])
     time.sleep(3)
@@ -215,7 +228,7 @@ def game(l, player):
 
 def gameplay():
     name = input("Enter your name warrior and start your journey... ")
-    player1 = Player(name, 3, 50, 40, 2, 1)
+    player1 = Player(name, 3, 50, 40, 2, 1, 50, 1)
     time.sleep(2)
     print(player1.__str__())
     time.sleep(2)
@@ -225,6 +238,10 @@ def gameplay():
     game(a[0], player1)
     if player1.health <= 0:
         exit()
+    time.sleep(1)
+    print("Leveled up!!!   Max health raised to 60!")
+    player1.max_health = 60
+    player1.level += 1
     time.sleep(1)
     village(player1, shop)
     time.sleep(2)
@@ -236,7 +253,11 @@ def gameplay():
     if player1.health <= 0:
         exit()
     time.sleep(2)
-    village(player1, shop2)
+    print("Leveled up!!!   Max health raised to 70!")
+    player1.max_health = 70
+    player1.level += 1
+    time.sleep(2)
+    village(player1, shop)
     time.sleep(3)
     print("\nYou warrior, are ready for the dragon...")
     combat(player1, dragon)
@@ -244,8 +265,9 @@ def gameplay():
         exit()
     elif dragon.health <= 0:
         print("Congratulations!!! You've vanquished the dragon!!")
-        print("You have earned the dragons horde!   200gp!")
+        print("You have earned the dragons horde!   200gp!\n")
         player1.money += 200
 
 
-gameplay()
+if __name__ == "__main__":
+    gameplay()
